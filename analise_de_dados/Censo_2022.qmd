@@ -1,0 +1,33 @@
+---
+title: "Censo_2022"
+format: pdf
+editor: visual
+---
+
+### Puxando os pacotes
+
+```{r}
+library(tidyverse)
+library(readxl)
+library(sf)
+library(geobr)
+```
+
+### Lendo os bancos
+
+```{r}
+Agregados <- read_excel("analise_de_dados/dados/Censo 2022/Agregados_preliminares_por_setores_censitarios_DF.xlsx")
+
+Dicionario <- read_excel("analise_de_dados/dados/Censo 2022/Dicionario_de_dados_agregados_preliminares.xlsx")
+
+malha <- read_sf("analise_de_dados/dados/Censo 2022/DF_Malha_Preliminar_2022/DF_Malha_Preliminar_2022.shp")
+```
+
+```{r}
+Dicionario[c(1,2,4)]
+```
+
+```{r}
+plot(malha$geometry)
+```
+
