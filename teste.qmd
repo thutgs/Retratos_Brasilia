@@ -1,9 +1,8 @@
 ---
-title: "Censo_2022"
+title: "Teste"
 format: pdf
 editor: visual
 ---
-
 
 ```{r, echo=FALSE}
 library(tidyverse)
@@ -26,6 +25,7 @@ malha <- read_sf("analise_de_dados/dados/Censo 2022/DF_Malha_Preliminar_2022/DF_
 ```{r}
 plot(malha$geometry)
 ```
+
 ## Análises
 
 ### Total de pessoas no DF
@@ -37,7 +37,7 @@ sum(Agregados$v0001) %>%
 
 ### Total de pessoas por RA
 
-```{r, echo=FALSE}
+```{r, eval=TRUE}
 Agregados %>%
   group_by(NM_SUBDIST) %>% 
   summarise(Total = sum(v0001)) %>% 
@@ -85,7 +85,6 @@ Agregados %>%
   kable(col.names = c("", "RA", "Total de domícilios particulares"))
 ```
 
-
 ### Total de domicílios coletivos no DF
 
 ```{r, echo=False}
@@ -107,12 +106,10 @@ Agregados %>%
 
 ### Média de moradores em domicílios particulares ocupados no DFsoma total / subdistritos)
 
-
 ```{r, echo=False}
 round(mean(Agregados$v0005), 2) %>% 
   kable(col.names = "Total de pessoas no DF")
 ```
-
 
 ### Média de moradores em domicílios particulares ocupados por RA(soma total / subdistritos)
 
@@ -126,14 +123,14 @@ Agregados %>%
   kable(col.names = c("", "RA", "média de moradores em dom. part. ocupados"))
 ```
 
-### Total de moradores em domicílios particulares ocupados no DF(V5*V7)
+### Total de moradores em domicílios particulares ocupados no DF(V5\*V7)
 
 ```{r, echo=False}
 (mean(Agregados$v0005) * sum(Agregados$v0007)) %>% 
   kable(col.names = "Total de pessoas no DF")
 ```
 
-### Total de moradores em domicílios particulares ocupados por RA(V5*V7)
+### Total de moradores em domicílios particulares ocupados por RA(V5\*V7)
 
 ```{r, echo=FALSE}
 Agregados %>%
@@ -164,8 +161,6 @@ Agregados %>%
   kable(col.names = c("", "RA", "Percentual de dom. part. ocupados imputados"))
 ```
 
-
-
 ### Total de domicílios particulares ocupado no DF
 
 ```{r, echo=False}
@@ -184,7 +179,3 @@ Agregados %>%
   select(c(3,1,2)) %>% 
   kable(col.names = c("", "RA", "Total de dom. part. ocupados"))
 ```
-
-
-
-
