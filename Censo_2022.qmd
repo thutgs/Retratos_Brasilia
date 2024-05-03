@@ -63,19 +63,21 @@ plot(malha$geometry)
 
 ```{r, echo=FALSE}
 sum(Agregados$v0001) %>%
+  format(decimal.mark = ",", big.mark = ".") %>% 
   kable(col.names = "Total de pessoas no DF")
 ```
 
 ### Total de pessoas por RA
 
 ```{r, echo=FALSE}
+options(scipen = 999)
 Agregados %>%
   group_by(NM_SUBDIST) %>% 
   summarise(Total = sum(v0001)) %>% 
   arrange(desc(Total)) %>% 
   head(10) %>% 
   ggplot() +
-  aes(x = fct_reorder(NM_SUBDIST, Total, .desc=T), y = Total, label = Total) +
+  aes(x = fct_reorder(NM_SUBDIST, Total, .desc=T), y = Total, label = format(Total, decimal.mark = ",", big.mark = ".")) +
   geom_bar(stat = "identity", fill = "dark blue", width = 0.7) +
   geom_text(
     position = position_dodge(width = .9),
@@ -86,6 +88,9 @@ Agregados %>%
   labs(x = "Região Administrativa", y = "Total", title = "10 RA's com maior número total de pessoas") +
   theme_estat()
 ```
+Em 1969, com apenas nove anos de fundação, Brasília já tinha 79.128 favelados, que moravam em 14.607 barracos. Atualmente, Ceilândia é a RA mais populosa do Distrito Federal. A Novacap fez a demarcação em 97 dias, com início em 15 de outubro de 1970, assim foi criada a Campanha de Erradicação das Invasões – CEI.
+[Fonte](https://www.ceilandia.df.gov.br/2019/11/08/historia-de-ceilandia/)
+
 ```{r, echo=FALSE}
 Agregados %>%
   group_by(NM_SUBDIST) %>% 
@@ -93,7 +98,7 @@ Agregados %>%
   arrange(desc(Total)) %>% 
   tail(10) %>% 
   ggplot() +
-  aes(x = fct_reorder(NM_SUBDIST, Total, .desc=F), y = Total, label = Total) +
+  aes(x = fct_reorder(NM_SUBDIST, Total, .desc=F), y = Total, label = format(Total, decimal.mark = ",", big.mark = ".")) +
   geom_bar(stat = "identity", fill = "dark blue", width = 0.7) +
   geom_text(
     position = position_dodge(width = .9),
@@ -104,12 +109,14 @@ Agregados %>%
   labs(x = "Região Administrativa", y = "Total", title = "10 RA's com menor número total de pessoas") +
   theme_estat()
 ```
-
+Já o SIA, é uma RA recente, criada em julho de 2005 para abrigar pequenas indústrias e depósitos. É dependente de outras RAs, pois não possui hospitais ou postos de saúde públicos, obrigando a população dependente desse tipo de serviço a se deslocar às outras regiões.
+[Fonte](https://www.codeplan.df.gov.br/sia-uma-regiao-peculiar/#:~:text=O%20SIA%20foi%20criado%20em,fundamentais%20para%20o%20Distrito%20Federal) 
 
 ```{r, echo=FALSE}
 Agregados %>%
   group_by(NM_SUBDIST) %>% 
   summarise(Total = sum(v0001)) %>% 
+  mutate(Total = format(Total, decimal.mark = ",", big.mark = ".")) %>% 
   arrange(desc(Total)) %>% 
   mutate("n" = row_number()) %>% 
   select(c(3,1,2)) %>% 
@@ -118,8 +125,13 @@ Agregados %>%
 
 ### Total de domicílios no DF
 
+
+Domicílio, segundo o Instituto brasileiro de Geografia e Estatística, é o local estruturalmente separado e independente que se destina a servir de habitação a uma ou mais pessoas, ou que esteja sendo utilizado como tal. Os critérios essenciais desta definição são os de separação e independência. Entende-se por separação o local de habitação limitado por paredes, muros ou cercas, coberto por um teto, permitindo a uma ou mais pessoas que nele habitam isolar-se das demais, com a finalidade de dormir, preparar e/ou consumir seus alimentos e proteger-se do meio ambiente, arcando, total ou parcialmente, com suas despesas de alimentação ou moradia. Por independência se entende quando o local de habitação tem acesso direto, permitindo a seus moradores entrar e sair sem necessidade de passar por locais de moradia de outras pessoas. Só caracteriza-se corretamente domicílio quando forem atendidos simultaneamente os critérios de separação e independência.
+
+
 ```{r, echo=FALSE}
 sum(Agregados$v0002) %>% 
+  format(decimal.mark = ",", big.mark = ".") %>%
   kable(col.names = "Total de domícilios no DF")
 ```
 
@@ -132,7 +144,7 @@ Agregados %>%
   arrange(desc(Total)) %>% 
   head(10) %>% 
 ggplot() +
-  aes(x = fct_reorder(NM_SUBDIST, Total, .desc=T), y = Total, label = Total) +
+  aes(x = fct_reorder(NM_SUBDIST, Total, .desc=T), y = Total, label = format(Total, decimal.mark = ",", big.mark = ".")) +
   geom_bar(stat = "identity", fill = "dark blue", width = 0.7) +
   geom_text(
     position = position_dodge(width = .9),
@@ -152,7 +164,7 @@ Agregados %>%
   arrange(desc(Total)) %>% 
   tail(10) %>% 
 ggplot() +
-  aes(x = fct_reorder(NM_SUBDIST, Total, .desc=F), y = Total, label = Total) +
+  aes(x = fct_reorder(NM_SUBDIST, Total, .desc=F), y = Total, label = format(Total, decimal.mark = ",", big.mark = ".")) +
   geom_bar(stat = "identity", fill = "dark blue", width = 0.7) +
   geom_text(
     position = position_dodge(width = .9),
@@ -168,6 +180,7 @@ ggplot() +
 Agregados %>%
   group_by(NM_SUBDIST) %>% 
   summarise(Total = sum(v0002)) %>% 
+  mutate(Total = format(Total, decimal.mark = ",", big.mark = ".")) %>% 
   arrange(desc(Total)) %>% 
   mutate("n" = row_number()) %>% 
   select(c(3,1,2)) %>% 
@@ -176,8 +189,12 @@ Agregados %>%
 
 ### Total de domicílios particulares no DF
 
+Domicílio particular, segundo o IBGE, é o domicílio em que o relacionamento entre seus ocupantes é ditado por laços de parentesco, de dependência doméstica ou por normas de convivência.
+
+
 ```{r, echo=FALSE}
 sum(Agregados$v0003) %>% 
+  format(decimal.mark = ",", big.mark = ".") %>%
   kable(col.names = "Total de domícilios particulares no DF")
 ```
 
@@ -190,7 +207,7 @@ Agregados %>%
   arrange(desc(Total)) %>% 
   head(10) %>% 
 ggplot() +
-  aes(x = fct_reorder(NM_SUBDIST, Total, .desc=T), y = Total, label = Total) +
+  aes(x = fct_reorder(NM_SUBDIST, Total, .desc=T), y = Total, label = format(Total, decimal.mark = ",", big.mark = ".")) +
   geom_bar(stat = "identity", fill = "dark blue", width = 0.7) +
   geom_text(
     position = position_dodge(width = .9),
@@ -198,7 +215,7 @@ ggplot() +
     size = 2
   ) + 
   scale_x_discrete(guide = guide_axis(n.dodge=2))+
-  labs(x = "Região Administrativa", y = "Total de domícilios", title = "10 RA's com maior número de domicílios particulares") +
+  labs(x = "Região Administrativa", y = "Total de domícilios", title = "10 RA's com maior número de\n domicílios particulares") +
   theme_estat()
 ```
 
@@ -209,7 +226,7 @@ Agregados %>%
   arrange(desc(Total)) %>% 
   tail(10) %>% 
 ggplot() +
-  aes(x = fct_reorder(NM_SUBDIST, Total, .desc=F), y = Total, label = Total) +
+  aes(x = fct_reorder(NM_SUBDIST, Total, .desc=F), y = Total, label = format(Total, decimal.mark = ",", big.mark = ".")) +
   geom_bar(stat = "identity", fill = "dark blue", width = 0.7) +
   geom_text(
     position = position_dodge(width = .9),
@@ -217,14 +234,15 @@ ggplot() +
     size = 2
   ) + 
   scale_x_discrete(guide = guide_axis(n.dodge=2))+
-  labs(x = "Região Administrativa", y = "Total de domícilios", title = "10 RA's com menor número de domicílios particulares") +
+  labs(x = "Região Administrativa", y = "Total de domícilios", title = "10 RA's com menor número de\n domicílios particulares") +
   theme_estat()
 ```
 
 ```{r, echo=FALSE}
 Agregados %>%
   group_by(NM_SUBDIST) %>% 
-  summarise(Total = sum(v0003)) %>% 
+  summarise(Total = sum(v0003)) %>%
+  mutate(Total = format(Total, decimal.mark = ",", big.mark = ".")) %>% 
   arrange(desc(Total)) %>% 
   mutate("n" = row_number()) %>% 
   select(c(3,1,2)) %>% 
@@ -232,6 +250,9 @@ Agregados %>%
 ```
 
 ### Total de domicílios coletivos no DF
+
+Domicílio coletivo, segundo o IBGE, é o domicílio em que a relação entre as pessoas que nele habitam é restrita a normas de subordinação administrativa, como hotéis, pensões, presídios, penitenciárias, quartéis, postos militares, asilos, orfanatos, conventos, hospitais e clínicas (com internação), alojamento de trabalhadores, motéis, campings etc.
+[Fonte](https://censo2010.ibge.gov.br/materiais/guia-do-censo/glossario.html#:~:text=Domic%C3%ADlio%20coletivo%20%2D%20%C3%89%20o%20domic%C3%ADlio,%2C%20alojamento%20de%20trabalhadores%2C%20mot%C3%A9is%2C)
 
 ```{r, echo=FALSE}
 sum(Agregados$v0004) %>% 
@@ -258,7 +279,7 @@ ggplot() +
   labs(x = "Região Administrativa", y = "Total de domícilios", title = "10 RA's com maior número de domicílios coletivos") +
   theme_estat()
 ```
-
+Acreditamos que o Plano Piloto é a RA com maior número de domicílios coletivos, uma vez que possui a maior infraestrutura de hotéis, hospitais e cli1nicas(com internação).
 
 ```{r, echo=FALSE}
 Agregados %>%
@@ -313,7 +334,7 @@ ggplot() +
     size = 2
   ) + 
   scale_x_discrete(guide = guide_axis(n.dodge=2))+
-  labs(x = "Região Administrativa", y = "Total de domícilios", title = "10 RA's com maior média de moradores em \ndomicílios particulares ocupados") +
+  labs(x = "Região Administrativa", y = "Média de moradores", title = "10 RA's com maior média de moradores em \ndomicílios particulares ocupados") +
   theme_estat()
 ```
 
@@ -333,7 +354,7 @@ ggplot() +
     size = 2
   ) + 
   scale_x_discrete(guide = guide_axis(n.dodge=2))+
-  labs(x = "Região Administrativa", y = "Total de domícilios", title = "10 RA's com maior média de moradores em \ndomicílios particulares ocupados") +
+  labs(x = "Região Administrativa", y = "Média de moradores", title = "10 RA's com menor média de moradores em \ndomicílios particulares ocupados") +
   theme_estat()
 ```
 
@@ -348,10 +369,15 @@ Agregados %>%
   kable(col.names = c("", "RA", "média de moradores em dom. part. ocupados"))
 ```
 
+
+Acreditamos que o número de moradores por domicílio por RA se relaciona ao tipo de moradia nessas regiões, as RA com predominância de casas possuem maior quantidade de moradores por domicílio, e as com predominância de apartamentos, menor quantidade de moradores por domicílio, sendo o Sudoeste, SIA e Plano Piloto regiões com kitnets
+
+
 ### Total de moradores em domicílios particulares ocupados no DF
 
 ```{r, echo=FALSE}
 (mean(Agregados$v0005) * sum(Agregados$v0007)) %>% 
+  format(decimal.mark = ",", big.mark = ".") %>%
   kable(col.names = "Total de moradores em domicílios particulares ocupados no DF")
 ```
 
@@ -364,7 +390,7 @@ Agregados %>%
   arrange(desc(Total)) %>% 
   head(10) %>% 
 ggplot() +
-  aes(x = fct_reorder(NM_SUBDIST, Total, .desc=T), y = Total, label = Total) +
+  aes(x = fct_reorder(NM_SUBDIST, Total, .desc=T), y = Total, label = format(Total, decimal.mark = ",", big.mark = ".")) +
   geom_bar(stat = "identity", fill = "dark blue", width = 0.7) +
   geom_text(
     position = position_dodge(width = .9),
@@ -372,7 +398,7 @@ ggplot() +
     size = 2
   ) + 
   scale_x_discrete(guide = guide_axis(n.dodge=2))+
-  labs(x = "Região Administrativa", y = "Total de domícilios", title = "10 RA's com maior número de de moradores\n em domicílios particulares ocupados") +
+  labs(x = "Região Administrativa", y = "Total de moradores", title = "10 RA's com maior número de de moradores\n em domicílios particulares ocupados") +
   theme_estat()
 ```
 ```{r, echo=FALSE}
@@ -382,7 +408,7 @@ Agregados %>%
   arrange(desc(Total)) %>% 
   tail(10) %>% 
 ggplot() +
-  aes(x = fct_reorder(NM_SUBDIST, Total, .desc=F), y = Total, label = Total) +
+  aes(x = fct_reorder(NM_SUBDIST, Total, .desc=F), y = Total, label = format(Total, decimal.mark = ",", big.mark = ".")) +
   geom_bar(stat = "identity", fill = "dark blue", width = 0.7) +
   geom_text(
     position = position_dodge(width = .9),
@@ -390,7 +416,7 @@ ggplot() +
     size = 2
   ) + 
   scale_x_discrete(guide = guide_axis(n.dodge=2))+
-  labs(x = "Região Administrativa", y = "Total de domícilios", title = "10 RA's com menor número de de moradores\n em domicílios particulares ocupados") +
+  labs(x = "Região Administrativa", y = "Total de moradores", title = "10 RA's com menor número de de moradores\n em domicílios particulares ocupados") +
   theme_estat()
 ```
 
@@ -398,6 +424,7 @@ ggplot() +
 Agregados %>%
   group_by(NM_SUBDIST) %>% 
   summarise(Total = sum(v0005*v0007)) %>% 
+  mutate(Total = format(Total, decimal.mark = ",", big.mark = ".")) %>% 
   arrange(desc(Total)) %>% 
   mutate("n" = row_number()) %>% 
   select(c(3,1,2)) %>% 
@@ -428,7 +455,7 @@ ggplot() +
     size = 2
   ) + 
   scale_x_discrete(guide = guide_axis(n.dodge=2))+
-  labs(x = "Região Administrativa", y = "Total de domícilios", title = "10 RA's com maior percentual de domicílios\n particulares ocupados imputados") +
+  labs(x = "Região Administrativa", y = "Percentual de domícilios", title = "10 RA's com maior percentual de domicílios\n particulares ocupados imputados") +
   theme_estat()
 ```
 
@@ -447,7 +474,7 @@ ggplot() +
     size = 2
   ) + 
   scale_x_discrete(guide = guide_axis(n.dodge=2))+
-  labs(x = "Região Administrativa", y = "Total de domícilios", title = "10 RA's com menor percentual de domicílios\n particulares ocupados imputados") +
+  labs(x = "Região Administrativa", y = "Percentual de domícilios", title = "10 RA's com menor percentual de domicílios\n particulares ocupados imputados") +
   theme_estat()
 ```
 
@@ -465,6 +492,7 @@ Agregados %>%
 
 ```{r, echo=FALSE}
 sum(Agregados$v0007) %>% 
+  format(decimal.mark = ",", big.mark = ".") %>%
   kable(col.names = "Total de domícilios particulares ocupados no DF")
 ```
 
@@ -477,7 +505,7 @@ Agregados %>%
   arrange(desc(Total)) %>% 
   head(10) %>% 
 ggplot() +
-  aes(x = fct_reorder(NM_SUBDIST, Total, .desc=T), y = Total, label = Total) +
+  aes(x = fct_reorder(NM_SUBDIST, Total, .desc=T), y = Total, label = format(Total, decimal.mark = ",", big.mark = ".")) +
   geom_bar(stat = "identity", fill = "dark blue", width = 0.7) +
   geom_text(
     position = position_dodge(width = .9),
@@ -495,7 +523,7 @@ Agregados %>%
   arrange(desc(Total)) %>% 
   tail(10) %>% 
 ggplot() +
-  aes(x = fct_reorder(NM_SUBDIST, Total, .desc=F), y = Total, label = Total) +
+  aes(x = fct_reorder(NM_SUBDIST, Total, .desc=F), y = Total, label = format(Total, decimal.mark = ",", big.mark = ".")) +
   geom_bar(stat = "identity", fill = "dark blue", width = 0.7) +
   geom_text(
     position = position_dodge(width = .9),
@@ -511,10 +539,73 @@ ggplot() +
 Agregados %>%
   group_by(NM_SUBDIST) %>% 
   summarise(Total = sum(v0007)) %>% 
+  mutate(Total = format(Total, decimal.mark = ",", big.mark = ".")) %>% 
   arrange(desc(Total)) %>% 
   mutate("n" = row_number()) %>% 
   select(c(3,1,2)) %>% 
   kable(col.names = c("", "RA", "Total de dom. part. ocupados"))
 ```
 
+
+### Número de Pessoas por km2 no DF
+
+```{r, echo=FALSE}
+round((sum(Agregados$v0001)/sum(Agregados$AREA_KM2)),2) %>% 
+  format(decimal.mark = ",", big.mark = ".") %>%
+  kable(col.names = "Número de Pessoas por km2 no DF")
+```
+
+
+### Número de Pessoas por km^2 em cada RA
+
+```{r, echo=FALSE}
+Agregados %>% 
+  mutate(pessoas_km = v0001/AREA_KM2) %>% 
+  group_by(NM_SUBDIST) %>% 
+  summarise(média = round(mean(pessoas_km), 2)) %>% 
+  arrange(desc(média)) %>% 
+  head(10) %>% 
+ggplot() +
+  aes(x = fct_reorder(NM_SUBDIST, média, .desc=T), y = média, label = format(média, decimal.mark = ",", big.mark = ".")) +
+  geom_bar(stat = "identity", fill = "dark blue", width = 0.7) +
+  geom_text(
+    position = position_dodge(width = .9),
+    vjust = -0.5, #hjust = .5,
+    size = 2
+  ) + 
+  scale_x_discrete(guide = guide_axis(n.dodge=2))+
+  labs(x = "Região Administrativa", y = "Pessoas por km2", title = "10 RA's com maior número de Pessoas por km2") +
+  theme_estat()
+```
+```{r, echo=FALSE}
+Agregados %>% 
+  mutate(pessoas_km = v0001/AREA_KM2) %>% 
+  group_by(NM_SUBDIST) %>% 
+  summarise(média = round(mean(pessoas_km), 2)) %>% 
+  arrange(desc(média)) %>% 
+  tail(10) %>% 
+ggplot() +
+  aes(x = fct_reorder(NM_SUBDIST, média, .desc=F), y = média, label = format(média, decimal.mark = ",", big.mark = ".")) +
+  geom_bar(stat = "identity", fill = "dark blue", width = 0.7) +
+  geom_text(
+    position = position_dodge(width = .9),
+    vjust = -0.5, #hjust = .5,
+    size = 2
+  ) + 
+  scale_x_discrete(guide = guide_axis(n.dodge=2))+
+  labs(x = "Região Administrativa", y = "Pessoas por km^2", title = "10 RA's com maior número de Pessoas por km2") +
+  theme_estat()
+```
+
+```{r, echo=FALSE}
+Agregados %>% 
+  mutate(pessoas_km = v0001/AREA_KM2) %>% 
+  group_by(NM_SUBDIST) %>% 
+  summarise(média = round(mean(pessoas_km),2)) %>% 
+  mutate(média = format(média, decimal.mark = ",", big.mark = ".")) %>% 
+  arrange(desc(média)) %>% 
+  mutate("n" = row_number()) %>% 
+  select(c(3,1,2)) %>% 
+  kable(col.names = c("", "RA", "Pessoas por km2"))
+```
 
