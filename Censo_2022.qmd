@@ -57,6 +57,10 @@ malha <- read_sf("analise_de_dados/dados/Censo 2022/DF_Malha_Preliminar_2022/DF_
 plot(malha$geometry)
 ```
 
+
+![Malhas coloridas](Imagens\Malhas_coloridas.jpeg)
+
+
 ## Análises
 
 ### Total de pessoas no DF
@@ -189,7 +193,30 @@ Agregados %>%
 
 ### Total de domicílios particulares no DF
 
-Domicílio particular, segundo o IBGE, é o domicílio em que o relacionamento entre seus ocupantes é ditado por laços de parentesco, de dependência doméstica ou por normas de convivência.
+![Tipos de domíclios](Imagens\Tipos domícilios.jpeg)
+
+
+[Fonte](https://agenciadenoticias.ibge.gov.br/media/com_mediaibge/arquivos/ba9e3c5e6ba08cd72e3d00f06d3886da.pdf)
+
+
+Domicílio particular é a moradia onde o relacionamento entre seus ocupantes é ditado por laços de
+parentesco, de dependência doméstica ou por normas de convivência.
+
+Domicílio particular permanente é o domicílio que foi construído a fim de servir exclusivamente para habitação e,
+na data de referência, tinha a finalidade de servir de moradia a uma ou mais pessoas.
+
+Domicílio particular permanente ocupado é o domicílio particular permanente que, na data de referência, estava ocupado por moradores e no qual foi realizada a entrevista.
+
+Domicílio particular permanente ocupado sem entrevista é o domicílio particular permanente que estava ocupado na data de referência, porém não foi possível realizar a entrevista no momento da visita do Recenseador, já
+que seus moradores estavam ausentes ou se recusaram a responder. Para estes domicílios, o IBGE utilizou uma metodologia de imputação, que se encontra descrita, adiante, no item Tratamento dos Dados.
+
+Domicílio particular permanente de uso ocasional é o domicílio particular permanente que servia ocasionalmente de moradia na data de referência, ou seja, era o domicílio usado para descanso de fins de semana, férias ou
+outro fim, mesmo que, na data de referência, seus ocupantes ocasionais estivessem presentes.
+
+Domicílio particular permanente vago é o domicílio particular permanente que não tinha morador na data de referência, mesmo que, posteriormente, durante o período da coleta, tivesse sido ocupado.
+
+Domicílio particular improvisado ocupado é aquele domicílio que pode estar localizado em uma edificação que não tenha dependências destinadas exclusivamente à moradia (por exemplo, dentro de um bar), ou
+em calçadas, praças ou viadutos, como também estruturas móveis ou abrigos naturais (como grutas ou cavernas) e que, na data de referência, estavam ocupados por moradores.
 
 
 ```{r, echo=FALSE}
@@ -253,6 +280,14 @@ Agregados %>%
 
 Domicílio coletivo, segundo o IBGE, é o domicílio em que a relação entre as pessoas que nele habitam é restrita a normas de subordinação administrativa, como hotéis, pensões, presídios, penitenciárias, quartéis, postos militares, asilos, orfanatos, conventos, hospitais e clínicas (com internação), alojamento de trabalhadores, motéis, campings etc.
 [Fonte](https://censo2010.ibge.gov.br/materiais/guia-do-censo/glossario.html#:~:text=Domic%C3%ADlio%20coletivo%20%2D%20%C3%89%20o%20domic%C3%ADlio,%2C%20alojamento%20de%20trabalhadores%2C%20mot%C3%A9is%2C)
+~
+Classifica-se em duas espécies: Domicílio Coletivo com Morador e Domicílio Coletivo sem Morador. São exemplos de domicílio coletivo:
+• asilos, orfanatos, conventos e similares;
+• hotéis, motéis, campings, pensões e similares;
+• alojamento de trabalhadores ou estudantes, república de estudantes (instituição);
+• penitenciária, presídio ou casa de detenção; e
+• outros (quartéis, postos militares, hospitais e clínicas com internação), etc.
+
 
 ```{r, echo=FALSE}
 sum(Agregados$v0004) %>% 
@@ -544,6 +579,97 @@ Agregados %>%
   mutate("n" = row_number()) %>% 
   select(c(3,1,2)) %>% 
   kable(col.names = c("", "RA", "Total de dom. part. ocupados"))
+```
+
+
+### Total de domícilios particulares desocupados no DF
+
+```{r, echo=FALSE}
+(sum(Agregados$v0003) - sum(Agregados$v0007)) %>% 
+  format(decimal.mark = ",", big.mark = ".") %>%
+  kable(col.names = "Total de domícilios particulares desocupados no DF")
+```
+
+### Total de domicílios particulares desocupados por RA
+
+```{r, echo=FALSE}
+Agregados %>%
+  group_by(NM_SUBDIST) %>% 
+  summarise(Total = (sum(v0003) - sum(v0007))) %>% 
+  arrange(desc(Total)) %>% 
+  head(10) %>% 
+ggplot() +
+  aes(x = fct_reorder(NM_SUBDIST, Total, .desc=T), y = Total, label = format(Total, decimal.mark = ",", big.mark = ".")) +
+  geom_bar(stat = "identity", fill = "dark blue", width = 0.7) +
+  geom_text(
+    position = position_dodge(width = .9),
+    vjust = -0.5, #hjust = .5,
+    size = 2
+  ) + 
+  scale_x_discrete(guide = guide_axis(n.dodge=2))+
+  labs(x = "Região Administrativa", y = "Total de domícilios", title = "10 RA's com maior número de domicílios\n particulares desocupados") +
+  theme_estat()
+```
+
+```{r, echo=FALSE}
+Agregados %>%
+  group_by(NM_SUBDIST) %>% 
+  summarise(Total = (sum(v0003) - sum(v0007))) %>% 
+  arrange(desc(Total)) %>% 
+  tail(10) %>% 
+ggplot() +
+  aes(x = fct_reorder(NM_SUBDIST, Total, .desc=F), y = Total, label = format(Total, decimal.mark = ",", big.mark = ".")) +
+  geom_bar(stat = "identity", fill = "dark blue", width = 0.7) +
+  geom_text(
+    position = position_dodge(width = .9),
+    vjust = -0.5, #hjust = .5,
+    size = 2
+  ) + 
+  scale_x_discrete(guide = guide_axis(n.dodge=2))+
+  labs(x = "Região Administrativa", y = "Total de domícilios", title = "10 RA's com menor número de domicílios\n particulares desocupados") +
+  theme_estat()
+```
+
+
+```{r, echo=FALSE}
+Agregados %>%
+  group_by(NM_SUBDIST) %>% 
+  summarise(Total = (sum(v0003) - sum(v0007))) %>% 
+  mutate(Total = format(Total, decimal.mark = ",", big.mark = ".")) %>% 
+  arrange(desc(Total)) %>% 
+  mutate("n" = row_number()) %>% 
+  select(c(3,1,2)) %>% 
+  kable(col.names = c("", "RA", "Total de dom. part. desocupados"))
+```
+
+### Percentual de domícilios particulares desocupados no DF
+
+```{r, echo=FALSE}
+desocupados <- ((sum(Agregados$v0003) - sum(Agregados$v0007))/(sum(Agregados$v0003))) 
+str_c(round(desocupados*100, 2),"%") %>% 
+  kable(col.names = "Percentual de domicílios particulares desocupados no DF")
+```
+
+### Percentual de domícilios particulares desocupados por RA
+
+```{r, echo=FALSE}
+Agregados %>%
+  mutate(, desocupados = ((v0003 - v0007)/ v0003)*100) %>% 
+  group_by(NM_SUBDIST) %>% 
+  summarise(Total = round(mean(desocupados),2)) %>% 
+  arrange(desc(Total)) %>% 
+  head(10) %>% 
+ggplot() +
+  aes(x = fct_reorder(NM_SUBDIST, Total, .desc=T), y = Total, label = str_c(Total, "%")) +
+  geom_bar(stat = "identity", fill = "dark blue", width = 0.7) +
+  geom_text(
+    position = position_dodge(width = .9),
+    vjust = -0.5, #hjust = .5,
+    size = 2
+  ) + 
+  scale_x_discrete(guide = guide_axis(n.dodge=2))+
+  labs(x = "Região Administrativa", y = "Percentual de domícilios", title = "10 RA's com maior percentual de domicílios\n particulares desocupados") +
+  theme_estat()
 ```
 
 

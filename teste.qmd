@@ -1,0 +1,181 @@
+---
+title: "Teste"
+format: pdf
+editor: visual
+---
+
+```{r, echo=FALSE}
+library(tidyverse)
+library(readxl)
+library(sf)
+library(geobr)
+library(rasterVis)
+```
+
+```{r, echo=FALSE}
+Agregados <- read_excel("analise_de_dados/dados/Censo 2022/Agregados_preliminares_por_setores_censitarios_DF.xlsx")
+
+Dicionario <- read_excel("analise_de_dados/dados/Censo 2022/Dicionario_de_dados_agregados_preliminares.xlsx")
+
+malha <- read_sf("analise_de_dados/dados/Censo 2022/DF_Malha_Preliminar_2022/DF_Malha_Preliminar_2022.shp")
+```
+
+### Mapa com os setores censitários
+
+```{r}
+plot(malha$geometry)
+```
+
+## Análises
+
+### Total de pessoas no DF
+
+```{r, echo=False}
+sum(Agregados$v0001) %>% 
+  kable(col.names = "Total de pessoas no DF")
+```
+
+### Total de pessoas por RA
+
+```{r, eval=TRUE}
+Agregados %>%
+  group_by(NM_SUBDIST) %>% 
+  summarise(Total = sum(v0001)) %>% 
+  arrange(desc(Total)) %>% 
+  mutate("n" = row_number()) %>% 
+  select(c(3,1,2)) %>% 
+  kable(col.names = c("", "RA", "Total de pessoas"))
+```
+
+### Total de domicílios no DF
+
+```{r, echo=False}
+sum(Agregados$v0002) %>% 
+  kable(col.names = "Total de domícilios no DF")
+```
+
+### Total de domicílios por RA
+
+```{r, echo=FALSE}
+Agregados %>%
+  group_by(NM_SUBDIST) %>% 
+  summarise(Total = sum(v0002)) %>% 
+  arrange(desc(Total)) %>% 
+  mutate("n" = row_number()) %>% 
+  select(c(3,1,2)) %>% 
+  kable(col.names = c("", "RA", "Total de domícilios"))
+```
+
+### Total de domicílios particulares no DF
+
+```{r, echo=False}
+sum(Agregados$v0003) %>% 
+  kable(col.names = "Total de domícilios particulares no DF")
+```
+
+### Total de domicílios particulares por RA
+
+```{r, echo=FALSE}
+Agregados %>%
+  group_by(NM_SUBDIST) %>% 
+  summarise(Total = sum(v0003)) %>% 
+  arrange(desc(Total)) %>% 
+  mutate("n" = row_number()) %>% 
+  select(c(3,1,2)) %>% 
+  kable(col.names = c("", "RA", "Total de domícilios particulares"))
+```
+
+### Total de domicílios coletivos no DF
+
+```{r, echo=False}
+sum(Agregados$v0004) %>% 
+  kable(col.names = "Total de domícilios coletivos no DF")
+```
+
+### Total de domicílios coletivos por RA
+
+```{r, echo=FALSE}
+Agregados %>%
+  group_by(NM_SUBDIST) %>% 
+  summarise(Total = sum(v0004)) %>% 
+  arrange(desc(Total)) %>% 
+  mutate("n" = row_number()) %>% 
+  select(c(3,1,2)) %>% 
+  kable(col.names = c("", "RA", "Total de domícilios coletivos"))
+```
+
+### Média de moradores em domicílios particulares ocupados no DFsoma total / subdistritos)
+
+```{r, echo=False}
+round(mean(Agregados$v0005), 2) %>% 
+  kable(col.names = "Total de pessoas no DF")
+```
+
+### Média de moradores em domicílios particulares ocupados por RA(soma total / subdistritos)
+
+```{r, echo=FALSE}
+Agregados %>%
+  group_by(NM_SUBDIST) %>% 
+  summarise(Total = round(mean(v0005),2)) %>% 
+  arrange(desc(Total)) %>% 
+  mutate("n" = row_number()) %>% 
+  select(c(3,1,2)) %>% 
+  kable(col.names = c("", "RA", "média de moradores em dom. part. ocupados"))
+```
+
+### Total de moradores em domicílios particulares ocupados no DF(V5\*V7)
+
+```{r, echo=False}
+(mean(Agregados$v0005) * sum(Agregados$v0007)) %>% 
+  kable(col.names = "Total de pessoas no DF")
+```
+
+### Total de moradores em domicílios particulares ocupados por RA(V5\*V7)
+
+```{r, echo=FALSE}
+Agregados %>%
+  group_by(NM_SUBDIST) %>% 
+  summarise(Total = sum(v0005*v0007)) %>% 
+  arrange(desc(Total)) %>% 
+  mutate("n" = row_number()) %>% 
+  select(c(3,1,2)) %>% 
+  kable(col.names = c("", "RA", " Total de moradores em dom. part. ocupados"))
+```
+
+### Percentual de domicílios particulares ocupados imputados no DF
+
+```{r, echo=False}
+str_c(round(mean(Agregados$v0006),2),"%") %>% 
+  kable(col.names = "Percentual de domicílios particulares ocupados imputados no DF")
+```
+
+### Percentual de domicílios particulares ocupados imputados por RA
+
+```{r, echo=FALSE}
+Agregados %>%
+  group_by(NM_SUBDIST) %>% 
+  summarise(Total = str_c(round(mean(v0006),2), "%")) %>% 
+  arrange(desc(Total)) %>% 
+  mutate("n" = row_number()) %>% 
+  select(c(3,1,2)) %>% 
+  kable(col.names = c("", "RA", "Percentual de dom. part. ocupados imputados"))
+```
+
+### Total de domicílios particulares ocupado no DF
+
+```{r, echo=False}
+sum(Agregados$v0007) %>% 
+  kable(col.names = "Total de domícilios particulares ocupados no DF")
+```
+
+### Total de domicílios particulares ocupado por RA
+
+```{r, echo=FALSE}
+Agregados %>%
+  group_by(NM_SUBDIST) %>% 
+  summarise(Total = sum(v0007)) %>% 
+  arrange(desc(Total)) %>% 
+  mutate("n" = row_number()) %>% 
+  select(c(3,1,2)) %>% 
+  kable(col.names = c("", "RA", "Total de dom. part. ocupados"))
+```
