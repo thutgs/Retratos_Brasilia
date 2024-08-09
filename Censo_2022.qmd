@@ -4,13 +4,8 @@ format: pdf
 editor: visual
 ---
 
-
 ```{r, include=FALSE}
-estat_colors <- c(
-  "#A11D21", "#003366", "#CC9900",
-  "#663333", "#FF6600", "#CC9966",
-  "#999966", "#006606", "#008091", 
-  "#041835", "#666666" )
+estat_colors <- c("#016658","#a3ad00", "#191919","#EFE9EE")
 
 theme_estat <- function(...) {
   theme <- ggplot2::theme_bw() +
@@ -41,6 +36,7 @@ library(sf)
 library(geobr)
 library(rasterVis)
 library(knitr)
+library(openxlsx)
 ```
 
 ```{r, echo=FALSE}
@@ -48,14 +44,118 @@ Agregados <- read_excel("analise_de_dados/dados/Censo 2022/Agregados_preliminare
 
 Dicionario <- read_excel("analise_de_dados/dados/Censo 2022/Dicionario_de_dados_agregados_preliminares.xlsx")
 
-malha <- read_sf("analise_de_dados/dados/Censo 2022/DF_Malha_Preliminar_2022/DF_Malha_Preliminar_2022.shp")
+malha_2022 <- read_sf("analise_de_dados/dados/Censo 2022/DF_Malha_Preliminar_2022/DF_Malha_Preliminar_2022.shp")
+
+malha_2010 <- read_sf("analise_de_dados/dados/Censo 2010/df_setores_censitarios/53SEE250GC_SIR.shp")
+
+malha_2000_urbano <- read_sf("analise_de_dados/dados/Censo 2000/df_setores_censitarios_2000/Urbano/5300108.SHP")
+
+malha_2000_rural <- read_sf("analise_de_dados/dados/Censo 2000/df_setores_censitarios_2000/Rural/53SE500G.shp")
+
+regioes <- read_excel("analise_de_dados/dados/regioes.xlsx")
+
 ```
+
+```{r}
+malha_2022 <- inner_join(malha_2022, regioes, by = c("NM_SUBDIST" = "RA"))
+```
+
+```{r}
+malha_2022 %>% 
+  group_by(NM_SUBDIST) %>% 
+  summarise() %>% 
+  ungroup() -> mapa_df
+ggplot()+
+  geom_sf(data=mapa_df, color = "black", fill = "#016658")+
+  theme(panel.grid = element_line(colour = "transparent"),
+        panel.background = element_blank(),
+        axis.text = element_blank(),
+        axis.ticks = element_blank(), plot.title = element_text(hjust = 0.5))+
+  labs(x="", y="", title = " Mapa Distrito Federal")
+ggsave("mapa_DF.png", path = "graficos/", width = 190, height = 120, units = "mm")
+
+```
+
+
+
+
+```{r}
+options(scipen = 999)
+
+malha_2022 %>%
+  group_by(NM_SUBDIST) %>% 
+  summarise(Total = sum(v0001)) -> dados
+ggplot(dados) +
+  geom_sf(aes(fill = Total)) +
+  geom_sf_label(data=dados, aes(label = NM_SUBDIST), size = 1.5)+
+  scale_fill_gradient(low = "#D6E9E6", high = "#03332C", name = "Pessoas")+
+  theme(panel.grid = element_line(colour = "transparent"),
+        panel.background = element_blank(),
+        axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        plot.title = element_text(hjust = 0.5),
+        plot.caption = element_text(hjust = 0))+
+  labs(x="", y="", title = "Número de Pessoas por Região Administrativa em 2022", caption = "Fonte: IBGE Censo 2022")
+ggsave("RA_pessoas.png", path = "graficos/", width = 190, height = 120, units = "mm")
+```
+
+```{r}
+options(scipen = 999)
+
+malha_2022 %>%
+  group_by(Região) %>% 
+  summarise(Total = sum(v0001)) -> dados
+ggplot(dados) +
+  geom_sf(aes(fill = Total)) +
+  geom_sf_label(data=dados, aes(label = Região), size = 3)+
+  scale_fill_gradient(low = "#FFFFFF", high = "#03332C", name = "Pessoas")+
+  theme(panel.grid = element_line(colour = "transparent"),
+        panel.background = element_blank(),
+        axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        plot.title = element_text(hjust = 0.5),
+        plot.caption = element_text(hjust = 0))+
+  labs(x="", y="", title = "Número de Pessoas por Região em 2022", caption = "Fonte: IBGE Censo 2022")
+ggsave("Regiões_pessoas.png", path = "graficos/", width = 190, height = 120, units = "mm")
+```
+
+
+
+```{r}
+options(scipen = 999)
+
+ggplot(malha_2022) +
+  geom_sf(aes(fill = v0001)) +
+  scale_fill_gradient(low = "#D6E9E6", high = "#03332C", name = "Pessoas")+
+  theme(panel.grid = element_line(colour = "transparent"),
+        panel.background = element_blank(),
+        axis.text = element_blank(),
+        axis.ticks = element_blank(),
+        plot.title = element_text(hjust = 0.5),
+        plot.caption = element_text(hjust = 0))+
+  labs(x="", y="", title = "Número de Pessoas por Região Administrativa em 2022", caption = "Fonte: IBGE Censo 2022")
+ggsave("Setores_pessoas.png", path = "graficos/", width = 190, height = 120, units = "mm")
+```
+
 
 ### Mapa do Distrito Federal com os setores censitários
 
 ```{r, echo=FALSE}
-plot(malha$geometry)
+ggplot() +
+  geom_sf(data = malha_2022)+
+  labs(title = "Malha 2022")+
+  theme_classic()
+ggsave("Setores_2022.png", path = "graficos/", width = 190, height = 120, units = "mm")
 ```
+
+```{r}
+ggplot() +
+  geom_sf(data = malha_2010)+
+  labs(title = "Malha 2010") +
+  theme_classic()
+ggsave("Setores_2010.png", path = "graficos/", width = 190, height = 120, units = "mm")
+```
+
 
 
 ![Malhas coloridas](Imagens\Malhas_coloridas.jpeg)
@@ -79,18 +179,22 @@ Agregados %>%
   group_by(NM_SUBDIST) %>% 
   summarise(Total = sum(v0001)) %>% 
   arrange(desc(Total)) %>% 
-  head(10) %>% 
+  #head(10) %>% 
   ggplot() +
   aes(x = fct_reorder(NM_SUBDIST, Total, .desc=T), y = Total, label = format(Total, decimal.mark = ",", big.mark = ".")) +
-  geom_bar(stat = "identity", fill = "dark blue", width = 0.7) +
+  geom_bar(stat = "identity", fill = "#016658", width = 0.7) +
   geom_text(
     position = position_dodge(width = .9),
-    vjust = -0.5, #hjust = .5,
+    hjust = .01,
     size = 2
   ) + 
-  scale_x_discrete(guide = guide_axis(n.dodge=2))+
-  labs(x = "Região Administrativa", y = "Total", title = "10 RA's com maior número total de pessoas") +
-  theme_estat()
+  #scale_x_discrete(guide = guide_axis(n.dodge=2))+
+  labs(x = "Região Administrativa", y = "", title = "Número de pessoas por Região Administrativa em 2022", caption = "Fonte: IBGE Censo 2022") +
+  coord_flip()+
+  ylim(0, 301000)+
+  theme_estat()+
+  theme(plot.caption = element_text(hjust=0))
+ggsave("pessoas.png", path = "graficos/", width = 240, height = 120, units = "mm")
 ```
 Em 1969, com apenas nove anos de fundação, Brasília já tinha 79.128 favelados, que moravam em 14.607 barracos. Atualmente, Ceilândia é a RA mais populosa do Distrito Federal. A Novacap fez a demarcação em 97 dias, com início em 15 de outubro de 1970, assim foi criada a Campanha de Erradicação das Invasões – CEI.
 [Fonte](https://www.ceilandia.df.gov.br/2019/11/08/historia-de-ceilandia/)
